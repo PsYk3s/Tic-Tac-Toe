@@ -10,10 +10,10 @@
 <body>
     <div id="container">
         <div id="heading"><h1>Tic-Tac-Toe</h1></div>
-        <div id="players">Name versus Name</div>
+        <div id="players">Ready to go? Click start.</div>
         <div id="game-board">
-            <div id="1" class="tile">x</div>
-            <div id="2" class="tile">o</div>
+            <div id="1" class="tile"></div>
+            <div id="2" class="tile"></div>
             <div id="3" class="tile"></div>
             <div id="4" class="tile"></div>
             <div id="5" class="tile"></div>
@@ -24,8 +24,12 @@
         </div>
         <div id="scores">0 - 0</div>
         <div id="button-container">
-            <button id="start-reset">Start</button>
+            <button id="start-reset" onclick="game.newGame()" class="btn">Start</button>
         </div>
+    </div>
+    <div id="overlay">
+        <div id="overlay-heading"><h1>Continue playing?</h1></div>
+        <button id="continue" class="btn">Next Round</button><button id="reset" class="btn">Reset</button>
     </div>
 </body>
 </html>

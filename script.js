@@ -5,7 +5,7 @@ const gameObj = [
         gameBoard: Array.from(tiles),
         winnerRef: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]],
         turn: 1,
-        round: 0,
+        round: 1,
     },
     {
         player1: "Player 1",
@@ -19,14 +19,16 @@ const game = (function () {
 
     const scores = document.getElementById("scores")
     const players = document.getElementById("players")
+    const overlay = document.getElementById("overlay")
 
     const clearBoard = () => {
         gameObj[0].turn = 1;
         Array.from(tiles).forEach(e => {
             e.innerText = "";
             e.addEventListener("click", () => {
-                e.innerText = gameObj[0].turn % 2 != 0 ? "x" : "o";
-                evaluate();
+                e.innerText = gameObj[0].turn % 2 !== 0 ? "x" : "o";
+                gameObj[0].turn++;
+                update()
             },
                 { once: true }
             )
@@ -36,7 +38,8 @@ const game = (function () {
 
     const newGame = () => {
         clearBoard()
-        gameObj[0].round = 0;
+        overlay.style.display = "none";
+        gameObj[0].round = 1;
         gameObj[0].turn = 1;
         gameObj[1].player1 = prompt("Who is player 1?", "Player 1")
         gameObj[1].player2 = prompt("Who is player 2?", "Player 2")
@@ -47,15 +50,15 @@ const game = (function () {
 
     const newRound = () => {
         clearBoard()
+        overlay.style.display = "none";
         gameObj[0].round++;
         update()
     }
 
     const update = () => {
-
-        scores.innerText = `${gameObj[1].player1Score} - ${gameObj[1].player2Score}`;
+        scores.innerText = `Turn: ${gameObj[0].turn} Scores: ${gameObj[1].player1Score} - ${gameObj[1].player2Score} Round: ${gameObj[0].round}`;
         players.innerText = `${gameObj[1].player1} versus ${gameObj[1].player2}`;
-
+        evaluate();
     }
 
     const evaluate = () => {
@@ -64,22 +67,16 @@ const game = (function () {
             if (tiles[(gameObj[0].winnerRef[i][0]) - 1].innerText === tiles[(gameObj[0].winnerRef[i][1]) - 1].innerText &&
                 tiles[(gameObj[0].winnerRef[i][1]) - 1].innerText === tiles[(gameObj[0].winnerRef[i][2]) - 1].innerText &&
                 tiles[(gameObj[0].winnerRef[i][0]) - 1].innerText !== "") {
-                console.log("winner")
-                gameObj[0].turn % 2 != 0 ? gameObj[1].player1Score++ : gameObj[1].player2Score++;
-                newRound()
+                gameObj[0].turn % 2 !== 0 ? gameObj[1].player1Score++ : gameObj[1].player2Score++;
+                overlay.style.display = "block";
                 return
             };
         };
 
         if (gameObj[0].turn > 9) {
-
-            console.log("no winner")
-            newRound()
+            overlay.style.display = "block";
             return
         };
-
-        gameObj[0].turn++;
-
     }
 
     return { newGame, newRound, update }

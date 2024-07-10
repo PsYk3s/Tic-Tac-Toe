@@ -1,84 +1,63 @@
-const tiles = document.querySelectorAll(".tile");
+const start = document.getElementById("start")
+const continueGame = document.getElementById("continue")
+const createTiles = document.querySelectorAll(".tile")
+const boardText = document.getElementById("players")
+const scores = document.getElementById("scores")
 
-const gameObj = [
-    {
-        gameBoard: Array.from(tiles),
-        winnerRef: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]],
-        turn: 1,
-        round: 1,
-    },
-    {
-        player1: "Player 1",
-        player2: "Player 2",
-        player1Score: 0,
-        player2Score: 0,
-    },
-];
+const createPlayer = (player, mark) => {
+    const name = player;
+    const playerMark = mark
+    let score = 0;
+    const getScore = () => score;
+    const giveScore = () => score++;
+    return { name, getScore, giveScore, playerMark };
+}
 
-const game = (function () {
+const createGame = () => {
+    let turn = 0;
+    const getTurn = () => turn;
+    const addTurn = () => turn++;
+    return { getTurn, addTurn }
+}
 
-    const scores = document.getElementById("scores")
-    const players = document.getElementById("players")
-    const overlay = document.getElementById("overlay")
-
-    const clearBoard = () => {
-        gameObj[0].turn = 1;
-        Array.from(tiles).forEach(e => {
-            e.innerText = "";
-            e.addEventListener("click", () => {
-                e.innerText = gameObj[0].turn % 2 !== 0 ? "x" : "o";
-                gameObj[0].turn++;
-                update()
-            },
-                { once: true }
-            )
-        });
-        update()
-    }
-
-    const newGame = () => {
-        clearBoard()
-        overlay.style.display = "none";
-        gameObj[0].round = 1;
-        gameObj[0].turn = 1;
-        gameObj[1].player1 = prompt("Who is player 1?", "Player 1")
-        gameObj[1].player2 = prompt("Who is player 2?", "Player 2")
-        gameObj[1].player1Score = 0;
-        gameObj[1].player2Score = 0;
-        update()
-    }
-
-    const newRound = () => {
-        clearBoard()
-        overlay.style.display = "none";
-        gameObj[0].round++;
-        update()
-    }
-
-    const update = () => {
-        scores.innerText = `Turn: ${gameObj[0].turn} Scores: ${gameObj[1].player1Score} - ${gameObj[1].player2Score} Round: ${gameObj[0].round}`;
-        players.innerText = `${gameObj[1].player1} versus ${gameObj[1].player2}`;
-        evaluate();
-    }
-
-    const evaluate = () => {
-
-        for (let i = 0; i < gameObj[0].winnerRef.length; i++) {
-            if (tiles[(gameObj[0].winnerRef[i][0]) - 1].innerText === tiles[(gameObj[0].winnerRef[i][1]) - 1].innerText &&
-                tiles[(gameObj[0].winnerRef[i][1]) - 1].innerText === tiles[(gameObj[0].winnerRef[i][2]) - 1].innerText &&
-                tiles[(gameObj[0].winnerRef[i][0]) - 1].innerText !== "") {
-                gameObj[0].turn % 2 !== 0 ? gameObj[1].player1Score++ : gameObj[1].player2Score++;
-                overlay.style.display = "block";
-                return
-            };
+const validateWin = (tiles) => {
+    const winnerRef = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
+    for (let i = 0; i < winnerRef.length; i++) {
+        if (tiles[(winnerRef[i][0]) - 1].innerText === tiles[(winnerRef[i][1]) - 1].innerText &&
+            tiles[(winnerRef[i][1]) - 1].innerText === tiles[(winnerRef[i][2]) - 1].innerText &&
+            tiles[(winnerRef[i][0]) - 1].innerText !== "") {
+                return true;
         };
+    };
+}
 
-        if (gameObj[0].turn > 9) {
-            overlay.style.display = "block";
-            return
-        };
-    }
 
-    return { newGame, newRound, update }
+const startGame = (function () {
+    start.addEventListener("click", () => {
+        const player1 = createPlayer(prompt("Who's player 1?", "Player 1"), "x")
+        const player2 = createPlayer(prompt("Who's player 2?", "Player 2"), "o")
+        boardText.innerText = `${player1.name} versus ${player2.name}`
+        const game = createGame()
+        let whosTurn = player1;
+        createTiles.forEach( element => element.innerText = "" )
+        Array.from(createTiles).forEach( element => element.addEventListener( "click", () => {
 
-})()
+            if ( !validateWin( createTiles ) ) {
+                element.innerText = whosTurn.playerMark
+                
+                if ( validateWin( createTiles ) ) {
+                    whosTurn.giveScore()
+                    scores.innerText = `${ player1.getScore() } - ${ player2.getScore() }`
+                    boardText.innerText = `${ whosTurn.name } wins!`
+                }
+
+                game.addTurn()
+            }
+            whosTurn == player1 ? whosTurn = player2 : whosTurn = player1;
+
+        }, { once: true }));
+    })
+})();
+
+
+

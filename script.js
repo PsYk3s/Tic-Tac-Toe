@@ -1,8 +1,8 @@
 const start = document.getElementById("start")
-const continueGame = document.getElementById("continue")
 const createTiles = document.querySelectorAll(".tile")
 const boardText = document.getElementById("players")
 const scores = document.getElementById("scores")
+const btns = document.getElementById("button-container")
 
 const createPlayer = (player, mark) => {
     const name = player;
@@ -31,6 +31,14 @@ const validateWin = (tiles) => {
     };
 }
 
+const reset = () => {
+    console.log("Reset Game")
+}
+
+const playOn = () => {
+    console.log("Play on")
+}
+
 
 const startGame = (function () {
     start.addEventListener("click", () => {
@@ -49,6 +57,7 @@ const startGame = (function () {
                     whosTurn.giveScore()
                     scores.innerText = `${ player1.getScore() } - ${ player2.getScore() }`
                     boardText.innerText = `${ whosTurn.name } wins!`
+                    btns.innerHTML += `<button id="resetGame" class="btn" onclick="reset()">Reset?</button> <button id="continue" class="btn" onclick="playOn()">Play on</button>`
                 }
 
                 game.addTurn()

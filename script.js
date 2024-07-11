@@ -1,72 +1,127 @@
-const start = document.getElementById("start")
-const createTiles = document.querySelectorAll(".tile")
-const boardText = document.getElementById("players")
-const scores = document.getElementById("scores")
-const btns = document.getElementById("button-container")
+const start = document.getElementById( "start" )
 
-const createPlayer = (player, mark) => {
+
+//Create game state
+const createGame = () => {
+    let turn = 1;
+    const getTurn = () => turn;
+    const addTurn = () => turn++;
+    const setTurnZero = () => turn = 1;
+    console.log( "Game created" )
+    return { getTurn, addTurn, setTurnZero }
+}
+
+//Create player - factory - Static logic
+const createPlayer = ( player, mark ) => {
     const name = player;
-    const playerMark = mark
+    const playerMark = mark;
     let score = 0;
     const getScore = () => score;
     const giveScore = () => score++;
-    return { name, getScore, giveScore, playerMark };
+    const setScoreZero = () => score = 0;
+    return { name, getScore, giveScore, playerMark, setScoreZero };
 }
 
-const createGame = () => {
-    let turn = 0;
-    const getTurn = () => turn;
-    const addTurn = () => turn++;
-    return { getTurn, addTurn }
-}
+//Gameplay dynamic logic
+const gamePlay = () => {
 
-const validateWin = (tiles) => {
-    const winnerRef = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
-    for (let i = 0; i < winnerRef.length; i++) {
-        if (tiles[(winnerRef[i][0]) - 1].innerText === tiles[(winnerRef[i][1]) - 1].innerText &&
-            tiles[(winnerRef[i][1]) - 1].innerText === tiles[(winnerRef[i][2]) - 1].innerText &&
-            tiles[(winnerRef[i][0]) - 1].innerText !== "") {
-                return true;
-        };
-    };
-}
+    const scores = document.getElementById( "scores" )
+    const players = document.getElementById( "players" )
+    const playBtn = document.getElementById("play-again");
 
-const reset = () => {
-    console.log("Reset Game")
-}
+    //Update scores and players
+    const updateBoard = () => {
+        players.innerText = `${player1.name} versus ${player2.name}!`;
+        scores.innerText = `${ player1.getScore() } - ${ player2.getScore() }`;
+    }
 
-const playOn = () => {
-    console.log("Play on")
-}
+    //Refresh tiles
+    const clearTiles = () => {
+        tiles.forEach( tile => { tile.innerText = "" });
+        tiles.forEach( tile => { tile.removeEventListener( "click", clickAction )});
+        tiles.forEach( tile => { tile.addEventListener( "click", clickAction, { once: true })});
+    }
 
+    //Initiate the game
+    const game = createGame();
+    const player1 = createPlayer( prompt("Who's player 1?", "Player 1"), "x");
+    const player2 = createPlayer( prompt("Who's player 2?", "Player 2"), "o");
+    const tiles = Array.from(document.querySelectorAll(".tile"));
+    updateBoard()
+    let whosTurn = player1;
+    start.removeEventListener("click", gamePlay);
+    start.innerText = "Reset";
 
-const startGame = (function () {
-    start.addEventListener("click", () => {
-        const player1 = createPlayer(prompt("Who's player 1?", "Player 1"), "x")
-        const player2 = createPlayer(prompt("Who's player 2?", "Player 2"), "o")
-        boardText.innerText = `${player1.name} versus ${player2.name}`
-        const game = createGame()
-        let whosTurn = player1;
-        createTiles.forEach( element => element.innerText = "" )
-        Array.from(createTiles).forEach( element => element.addEventListener( "click", () => {
+    //Reset game
+    const reset = () => {
+        clearTiles()
+        player1.setScoreZero();
+        player2.setScoreZero();
+        game.setTurnZero();
+        whosTurn = player1;
+        updateBoard()
+    }
 
-            if ( !validateWin( createTiles ) ) {
-                element.innerText = whosTurn.playerMark
-                
-                if ( validateWin( createTiles ) ) {
+    //Play on
+    const playAgain = () => {
+        playBtn.style.display = "none"
+        clearTiles()
+        game.setTurnZero();
+        whosTurn = player1;
+        updateBoard()
+    }
+    
+    start.addEventListener( "click", reset )
+
+    //Winner check - returns boolean
+    const validateWin = () => {
+        const winnerRef = [
+            [1, 2, 3], 
+            [4, 5, 6], 
+            [7, 8, 9], 
+            [1, 4, 7], 
+            [2, 5, 8], 
+            [3, 6, 9], 
+            [1, 5, 9], 
+            [3, 5, 7]
+        ];
+
+        for ( let i = 0; i < winnerRef.length; i++ ) {
+            if (tiles[( winnerRef[i][0] ) - 1].innerText === tiles[( winnerRef[i][1] ) - 1].innerText &&
+                tiles[( winnerRef[i][1] ) - 1].innerText === tiles[( winnerRef[i][2] ) - 1].innerText &&
+                tiles[( winnerRef[i][0] ) - 1].innerText !== "") {
+                    tiles.forEach(tile => { tile.removeEventListener( "click", clickAction )})
                     whosTurn.giveScore()
-                    scores.innerText = `${ player1.getScore() } - ${ player2.getScore() }`
-                    boardText.innerText = `${ whosTurn.name } wins!`
-                    btns.innerHTML += `<button id="resetGame" class="btn" onclick="reset()">Reset?</button> <button id="continue" class="btn" onclick="playOn()">Play on</button>`
-                }
+                    players.innerText = `${whosTurn.name} wins!`;
+                    playBtn.style.display = "inline"
+                    playBtn.addEventListener("click", playAgain);
+            };
+            
+        };
 
-                game.addTurn()
-            }
-            whosTurn == player1 ? whosTurn = player2 : whosTurn = player1;
+        scores.innerText = `${player1.getScore()} - ${player2.getScore()}`
 
-        }, { once: true }));
-    })
-})();
+        //Check for ties
+        if ( game.getTurn() >= 9 ) {
+            players.innerText = `It's a tie!`;
+            tiles.forEach(tile => { tile.removeEventListener( "click", clickAction ) });
+            playBtn.style.display = "inline";
+            playBtn.addEventListener("click", playAgain);
+        }
+    }
+
+    //What happens on click
+    const clickAction = (e) => {
+        e.target.innerText = whosTurn.playerMark
+        validateWin()
+        whosTurn == player1 ? whosTurn = player2 : whosTurn = player1;
+        game.addTurn()
+    }
+
+    tiles.forEach( tile => { tile.addEventListener( "click", clickAction, { once: true })})
+}
+
+start.addEventListener( "click", gamePlay )
 
 
 

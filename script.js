@@ -5,8 +5,8 @@ const createGame = () => {
     let turn = 1;
     const getTurn = () => turn;
     const addTurn = () => turn++;
-    const setTurnZero = () => turn = 1;
-    return { getTurn, addTurn, setTurnZero }
+    const setTurnOne = () => turn = 1;
+    return { getTurn, addTurn, setTurnOne }
 }
 
 //Create player state
@@ -55,7 +55,7 @@ const gamePlay = () => {
         clearTiles()
         player1.setScoreZero();
         player2.setScoreZero();
-        game.setTurnZero();
+        game.setTurnOne();
         whosTurn = player1;
         updateBoard()
     }
@@ -64,7 +64,7 @@ const gamePlay = () => {
     const playAgain = () => {
         playBtn.style.display = "none"
         clearTiles()
-        game.setTurnZero();
+        game.setTurnOne();
         whosTurn = player1;
         updateBoard()
     }
@@ -113,7 +113,7 @@ const gamePlay = () => {
     const clickAction = (e) => {
         e.target.innerText = whosTurn.playerMark
         if (!validateWin()) {
-             validateTie()
+            validateTie()
         }
         whosTurn == player1 ? whosTurn = player2 : whosTurn = player1;
         game.addTurn()

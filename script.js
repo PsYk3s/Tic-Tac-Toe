@@ -6,7 +6,6 @@ const createGame = () => {
     const getTurn = () => turn;
     const addTurn = () => turn++;
     const setTurnZero = () => turn = 1;
-    console.log("Game created")
     return { getTurn, addTurn, setTurnZero }
 }
 

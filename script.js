@@ -10,7 +10,7 @@ const createGame = () => {
     return { getTurn, addTurn, setTurnZero }
 }
 
-//Create player - factory - Static logic
+//Create player state
 const createPlayer = (player, mark) => {
     const name = player;
     const playerMark = mark;
@@ -21,7 +21,7 @@ const createPlayer = (player, mark) => {
     return { name, getScore, giveScore, playerMark, setScoreZero };
 }
 
-//Gameplay dynamic logic
+//Gameplay
 const gamePlay = () => {
 
     const scores = document.getElementById("scores")
@@ -72,7 +72,7 @@ const gamePlay = () => {
 
     start.addEventListener("click", reset)
 
-    //Winner check - returns boolean
+    //Winner check
     const validateWin = () => {
         const winnerRef = [
             [1, 2, 3],

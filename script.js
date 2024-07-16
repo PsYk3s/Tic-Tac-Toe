@@ -41,6 +41,7 @@ const gamePlay = () => {
     }
 
     //Initiate the game
+    let inPlay = true
     const game = createGame();
     const player1 = createPlayer(prompt("Who's player 1?", "Player 1"), "x");
     const player2 = createPlayer(prompt("Who's player 2?", "Player 2"), "o");
@@ -53,6 +54,7 @@ const gamePlay = () => {
     //Reset game
     const reset = () => {
         clearTiles()
+        inPlay = true;
         player1.setScoreZero();
         player2.setScoreZero();
         game.setTurnOne();
@@ -62,6 +64,7 @@ const gamePlay = () => {
 
     //Play on
     const playAgain = () => {
+        inPlay = true;
         playBtn.style.display = "none"
         clearTiles()
         game.setTurnOne();
@@ -90,6 +93,7 @@ const gamePlay = () => {
                 tiles[(winnerRef[i][0]) - 1].innerText !== "") {
                 tiles.forEach(tile => { tile.removeEventListener("click", clickAction) })
                 whosTurn.giveScore()
+                inPlay = false;
                 players.innerText = `${whosTurn.name} wins!`;
                 playBtn.style.display = "inline"
                 playBtn.addEventListener("click", playAgain);
@@ -100,7 +104,7 @@ const gamePlay = () => {
 
     //Check for ties
     const validateTie = () => {
-        if (game.getTurn() >= 9) {
+        if (game.getTurn() >= 9 && inPlay) {
             players.innerText = `It's a tie!`;
             tiles.forEach(tile => { tile.removeEventListener("click", clickAction) });
             playBtn.style.display = "inline";
@@ -111,6 +115,7 @@ const gamePlay = () => {
 
     //What happens on click
     const clickAction = (e) => {
+        console.log(game.getTurn())
         e.target.innerText = whosTurn.playerMark
         if (!validateWin()) {
             validateTie()
